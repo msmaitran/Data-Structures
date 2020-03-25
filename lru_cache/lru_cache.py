@@ -10,8 +10,7 @@ class LRUCache:
     """
     def __init__(self, limit=10):
         self.limit = limit
-        self.size = 0
-        self.cache = DoublyLinkedList()
+        self.order = DoublyLinkedList()
         self.storage_dict = {}
 
     """
@@ -22,12 +21,16 @@ class LRUCache:
     key-value pair doesn't exist in the cache.
     """
     def get(self, key):
-        if key in self.storage_dict:
-            node = self.storage_dict[key]
-            self.cache.move_to_front(node)
-            return node.value
-        else:
+        # Key is not in cache - return none
+        if key not in self.storage_dict:
             return None
+        else:
+        # Key is in cache
+            # move it to most recently used
+            node = self.storage_dict[key]
+            self.order.move_to_end(node)
+            # return value
+            return node.value[1]
 
     """
     Adds the given key-value pair to the cache. The newly-
@@ -40,19 +43,23 @@ class LRUCache:
     the newly-specified value.
     """
     def set(self, key, value):
+        # Different scenarios
+        # if item/key already exists
         if key in self.storage_dict:
-            self.storage_dict[key].value = value
+            # overwrite the value
+            # where is the value stored?
             node = self.storage_dict[key]
-            self.cache.move_to_front(node)
-        else:
-            self.cache.add_to_head(value)
-            self.storage_dict[key] = self.cache.head
-            if self.size >= self.limit:
-                tail = self.cache.tail
-                for keys in self.storage_dict:
-                    if self.storage_dict[keys] == tail:
-                        del self.storage_dict[keys]
-                        break
-                self.cache.remove_from_tail()
-            else:
-                self.size += 1
+            node.value = (key, value)
+            self.order.move_to_end(node)
+            return
+        # size is at limit
+        if len(self.order) == self.limit:
+            # evict the oldest one
+            index_of_oldest = self.order.head.value[0]
+            del self.storage_dict[index_of_oldest]
+            self.order.remove_from_head()
+
+        # add to order
+        self.order.add_to_tail((key, value))
+        # add it to storage
+        self.storage_dict[key] = self.order.tail
