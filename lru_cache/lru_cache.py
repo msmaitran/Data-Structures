@@ -55,4 +55,23 @@ class LRUCache:
                         break
                 self.cache.remove_from_tail()
             else:
+<<<<<<< HEAD
                 self.size += 1
+=======
+                self.size += 1
+
+test = LRUCache(3)
+
+test.set('item1', 'a')
+
+
+test.set('item2', 'b')
+
+test.set('item3', 'c')
+
+
+test.set('item2', 'z')
+print(test.get("item1"))
+print(test.get("item2"))
+print(test.get("item3"))
+>>>>>>> 04df047b155098273d12c5395b5757ddb59622e4
